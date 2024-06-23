@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Mejores Precios</title>
+    <link rel="icon" type="image/png" sizes="192x192" href="foto.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="applefoto.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #e0f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 10px;
+        }
+
+        .container {
+            background-color: #b3e5fc;
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #0277bd;
+            font-size: 32px;
+            margin-bottom: 20px;
+            margin-top: 0;
+            font-weight: 700;
+        }
+
+        .product {
+            background-color: #d5f4ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 4px solid #4fc3f7;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .product h3 {
+            color: #0288d1;
+            font-size: 32px;
+            margin-bottom: 15px;
+            margin-top: 0;
+            font-weight: 700;
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .input-wrapper {
+            width: calc(25% - 10px);
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #0288d1;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+            background-color: #ffffff;
+            position: relative;
+            box-shadow: 0 3px 0 #0078b3;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #015b8e;
+            box-shadow: 0 3px 0 #015b8e;
+        }
+
+        input:active, select:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #0288d1;
+        }
+
+        .error {
+            border-color: #e74c3c;
+            box-shadow: 0 3px 0 #c0392b;
+        }
+
+        button {
+            background-color: #0288d1;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            margin: 10px 5px;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            position: relative;
+            box-shadow: 0 3px 0 #015b8e;
+        }
+
+        button:hover {
+            background-color: #015b8e;
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #015b8e;
+        }
+
+        #result {
+            font-size: 18px;
+            line-height: 1.5;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            border: 1px solid #4fc3f7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .input-wrapper {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Calculadora de Mejores Precios</h2>
+        <div id="products-container"></div>
+        <button id="add-product-btn">Agregar producto</button>
+        <button id="calculate-btn">Calcular</button>
+        <div id="result" class="hidden"></div>
+    </div>
+
+    <script>
+        
+        document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === 'hidden') {
+        // La página se ha vuelto invisible, recargarla
+        window.location.reload(true);
+    }
+});
+        
+        // El código JavaScript permanece sin cambios
+        let productCount = 0;
+        const productsContainer = document.getElementById('products-container');
+        const addProductBtn = document.getElementById('add-product-btn');
+        const calculateBtn = document.getElementById('calculate-btn');
+        const resultEl = document.getElementById('result');
+
+        function addProduct() {
+            productCount++;
+            const productDiv = document.createElement('div');
+            productDiv.className = 'product';
+            productDiv.innerHTML = `
+                <h3>Producto ${productCount}</h3>
+                <div class="input-group">
+                    <div class="input-wrapper">
+                        <input type="number" class="price" placeholder="Precio" step="0.01" min="0" required>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="number" class="quantity" placeholder="Cantidad" min="1" required>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="number" class="weight" placeholder="Peso" min="0" step="0.01" required>
+                    </div>
+                    <div class="input-wrapper">
+                        <select class="weight-unit">
+                            <option value="g" selected>Gramos</option>
+                            <option value="kg">Kilogramos</option>
+                            <option value="lb">Libras</option>
+                            <option value="oz">Onzas</option>
+                        </select>
+                    </div>
+                </div>
+                ${productCount > 2 ? '<button class="remove-btn">Eliminar</button>' : ''}
+            `;
+            productsContainer.appendChild(productDiv);
+
+            if (productCount > 2) {
+                const removeBtn = productDiv.querySelector('.remove-btn');
+                removeBtn.addEventListener('click', () => removeProduct(productDiv));
+            }
+
+            const inputs = productDiv.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('input', validateInput);
+            });
+        }
+
+        function removeProduct(productDiv) {
+            if (productCount > 2) {
+                productsContainer.removeChild(productDiv);
+                productCount--;
+                updateProductNumbers();
+            }
+        }
+
+        function updateProductNumbers() {
+            const products = productsContainer.querySelectorAll('.product');
+            products.forEach((product, index) => {
+                product.querySelector('h3').textContent = `Producto ${index + 1}`;
+                if (index < 2) {
+                    const removeBtn = product.querySelector('.remove-btn');
+                    if (removeBtn) {
+                        removeBtn.remove();
+                    }
+                } else if (!product.querySelector('.remove-btn')) {
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'remove-btn';
+                    removeBtn.textContent = 'Eliminar';
+                    removeBtn.addEventListener('click', () => removeProduct(product));
+                    product.appendChild(removeBtn);
+                }
+            });
+        }
+
+        function validateInput(event) {
+            const input = event.target;
+            if (input.value.trim() === '' || (input.type === 'number' && parseFloat(input.value) <= 0)) {
+                input.classList.add('error');
+            } else {
+                input.classList.remove('error');
+            }
+        }
+
+        function convertToGrams(weight, unit) {
+            switch(unit) {
+                case 'kg': return weight * 1000;
+                case 'lb': return weight * 453.592;
+                case 'oz': return weight * 28.3495;
+                default: return weight;
+            }
+        }
+
+        function calculate() {
+            const products = productsContainer.querySelectorAll('.product');
+            let bestPrice = Infinity;
+            let bestProduct = 0;
+            let resultHTML = '<h3>Resultados:</h3>';
+            let allFieldsFilled = true;
+
+            products.forEach((product, index) => {
+                const price = parseFloat(product.querySelector('.price').value);
+                const quantity = parseFloat(product.querySelector('.quantity').value);
+                const weight = parseFloat(product.querySelector('.weight').value);
+                const weightUnit = product.querySelector('.weight-unit').value;
+
+                const inputs = product.querySelectorAll('input');
+                inputs.forEach(input => {
+                    if (input.value.trim() === '' || (input.type === 'number' && parseFloat(input.value) <= 0)) {
+                        input.classList.add('error');
+                        allFieldsFilled = false;
+                    } else {
+                        input.classList.remove('error');
+                    }
+                });
+
+                if (price && quantity && weight) {
+                    const weightInGrams = convertToGrams(weight, weightUnit);
+                    const pricePerGram = (price / quantity) / weightInGrams;
+                    
+                    resultHTML += `<p>Producto ${index + 1}: $${(pricePerGram * 100).toFixed(2)} por 100 gramos</p>`;
+
+                    if (pricePerGram < bestPrice) {
+                        bestPrice = pricePerGram;
+                        bestProduct = index + 1;
+                    }
+                }
+            });
+
+            if (!allFieldsFilled) {
+                alert('Por favor, llena todos los campos correctamente antes de calcular.');
+                return;
+            }
+
+            resultHTML += `<p><strong>El producto más económico es el Producto ${bestProduct} con $${(bestPrice * 100).toFixed(2)} por 100 gramos.</strong></p>`;
+            resultEl.innerHTML = resultHTML;
+            resultEl.classList.remove('hidden');
+        }
+
+        addProductBtn.addEventListener('click', addProduct);
+        calculateBtn.addEventListener('click', calculate);
+
+        // Inicializar con dos productos
+        addProduct();
+        addProduct();
+    </script>
+</body>
+</html>
